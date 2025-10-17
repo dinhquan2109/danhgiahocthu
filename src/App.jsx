@@ -292,17 +292,24 @@ const TrialEvaluationForm = () => {
         comments: ''
       };
 
-      // Save to Google Sheets
-      await googleSheetsService.saveEvaluation(evaluationData);
-      
-      // Also save to localStorage as backup
+      // Save to localStorage first (backup)
       const existingData = JSON.parse(localStorage.getItem('evaluationsList') || '[]');
-      existingData.push({
+      const newEvaluation = {
         ...evaluationData,
         id: Date.now(),
         timestamp: new Date().toISOString()
-      });
+      };
+      existingData.push(newEvaluation);
       localStorage.setItem('evaluationsList', JSON.stringify(existingData));
+
+      // Try to save to Google Sheets (optional)
+      try {
+        await googleSheetsService.saveEvaluation(evaluationData);
+        console.log('✅ Saved to Google Sheets successfully');
+      } catch (sheetsError) {
+        console.warn('⚠️ Google Sheets save failed, but data saved to localStorage:', sheetsError);
+        // Data is still saved to localStorage, so we continue
+      }
       
       setSaveStatus('success');
       
@@ -316,9 +323,14 @@ const TrialEvaluationForm = () => {
       });
       setSelectedLevel('');
       
-      // Reload data to update the list
-      const data = await googleSheetsService.getExistingData();
-      setAvailableClasses(data);
+      // Try to reload data from Google Sheets
+      try {
+        const data = await googleSheetsService.getExistingData();
+        setAvailableClasses(data);
+      } catch (reloadError) {
+        console.warn('⚠️ Could not reload from Google Sheets:', reloadError);
+        // Continue without error
+      }
       
       setTimeout(() => setSaveStatus(''), 3000);
     } catch (error) {
@@ -521,6 +533,30 @@ const TrialEvaluationForm = () => {
             >
               <Save className="w-4 h-4" />
               {loading ? 'ĐANG LƯU...' : 'GỬI ĐÁNH GIÁ'}
+            </button>
+
+            {/* Export Button */}
+            <button
+              onClick={async () => {
+                try {
+                  const localData = JSON.parse(localStorage.getItem('evaluationsList') || '[]');
+                  if (localData.length === 0) {
+                    alert('Không có dữ liệu để export');
+                    return;
+                  }
+                  
+                  for (const item of localData) {
+                    await googleSheetsService.saveEvaluation(item);
+                  }
+                  alert(`Đã export ${localData.length} bản ghi vào Google Sheets`);
+                } catch (error) {
+                  console.error('Export error:', error);
+                  alert('Lỗi khi export dữ liệu');
+                }
+              }}
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-2 rounded-lg font-medium hover:from-green-600 hover:to-emerald-700 transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 mt-2"
+            >
+              📤 Export dữ liệu vào Google Sheets
             </button>
           </div>
         </div>

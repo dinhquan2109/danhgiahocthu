@@ -4,7 +4,7 @@ export const GOOGLE_SHEETS_CONFIG = {
   SHEET_ID: '1H-nLX-zMzoxGJAB2HV-bP6_cIiPInVlYz4zYjs0KiLw',
   
   // API Key từ Google Cloud Console
-  API_KEY: 'AIzaSyChPjL6EFGH2_q9WCw5xE_sqiLSbV4IpTY',
+  API_KEY: 'AIzaSyB3ZNmQMNbJv_LgPtJ17aQKG-qyNQw6Jcg',
   
   // Tên các sheet trong file Google Sheets
   SHEETS: {
