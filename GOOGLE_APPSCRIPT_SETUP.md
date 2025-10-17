@@ -102,18 +102,28 @@ function doPost(e) {
       return criteriaMap[rating] || '';
     };
     
+    // Tạo status từ tất cả 5 ratings
+    const allRatings = [
+      data.ratings.communication || 1,
+      data.ratings.pronunciation || 1,
+      data.ratings.vocabulary || 1,
+      data.ratings.listening || 1,
+      data.ratings.reading || 1
+    ];
+    const statusText = allRatings.map(rating => getStatusValue(rating)).join(', ');
+    
     const values = [
       data.studentName,
       data.classCode,
       data.teacherName,
       data.level,
-      getStatusValue(data.ratings.communication || data.ratings.pronunciation || 1),
+      statusText,
       getCriteriaValue(data.ratings.communication || 1),
       getCriteriaValue(data.ratings.pronunciation || 1),
       getCriteriaValue(data.ratings.vocabulary || 1),
       getCriteriaValue(data.ratings.listening || 1),
       getCriteriaValue(data.ratings.reading || 1),
-      new Date().getTime()
+      new Date().toISOString()
     ];
     
     sheet.appendRow(values);

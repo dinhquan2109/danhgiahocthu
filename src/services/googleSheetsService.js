@@ -39,23 +39,44 @@ class GoogleSheetsService {
   // Ghi kết quả đánh giá vào Google Sheets
   async saveEvaluation(evaluationData) {
     try {
-      
+      // Thử với CORS trước
       const response = await fetch(this.apiUrl, {
         method: 'POST',
-        mode: 'no-cors', // ← THÊM DÒNG NÀY để bypass CORS
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(evaluationData)
       });
       
-      // Với no-cors, không đọc được response.json()
-      // Giả định thành công nếu không có lỗi
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       
-      return { success: true, message: 'Data saved successfully' };
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to save data');
+      }
+      
+      return result;
     } catch (error) {
-      console.error('❌ Error saving evaluation:', error);
-      throw error;
+      // Nếu CORS fail, thử no-cors
+      try {
+        await fetch(this.apiUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(evaluationData)
+        });
+        
+        return { success: true, message: 'Data saved successfully (no-cors mode)' };
+      } catch (noCorsError) {
+        console.error('❌ Error saving evaluation:', error);
+        throw error;
+      }
     }
   }
 
