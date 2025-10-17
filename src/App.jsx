@@ -270,7 +270,7 @@ const TrialEvaluationForm = () => {
         <div className="absolute bottom-20 left-1/4 w-48 h-48 bg-blue-300 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="max-w-5xl mx-auto relative z-10">
+      <div className="max-w-4xl mx-auto relative z-10">
         <div className="bg-white rounded-2xl shadow-xl p-4 mb-4 border-t-4 border-emerald-500">
           <div className="text-center">
             <div className="inline-block bg-gradient-to-br from-emerald-500 to-teal-500 p-2 rounded-full mb-2 shadow-lg">
@@ -292,7 +292,7 @@ const TrialEvaluationForm = () => {
                 <h2 className="text-base font-bold text-gray-800">THÔNG TIN HỌC VIÊN</h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-3">
                 <input
                   type="text"
                   value={formData.studentName}
@@ -317,21 +317,18 @@ const TrialEvaluationForm = () => {
                   placeholder="* Tên giáo viên"
                 />
 
-                {/* Trình độ lớp học */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-800 mb-2">* TRÌNH ĐỘ LỚP HỌC</label>
-                  <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
-                    <select
-                      value={selectedLevel}
-                      onChange={(e) => handleLevelSelect(e.target.value)}
-                      className="w-full px-3 py-2 focus:outline-none text-sm font-semibold text-gray-800 bg-white"
-                    >
-                      <option value="">Chọn trình độ...</option>
-                      {Object.entries(levels).map(([key, label]) => (
-                        <option key={key} value={key}>{label}</option>
-                      ))}
-                    </select>
-                  </div>
+                {/* Trình độ lớp học - ẩn như placeholder */}
+                <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
+                  <select
+                    value={selectedLevel}
+                    onChange={(e) => handleLevelSelect(e.target.value)}
+                    className="w-full px-3 py-2 focus:outline-none text-sm text-gray-500 bg-white"
+                  >
+                    <option value="">* Trình độ lớp học</option>
+                    {Object.entries(levels).map(([key, label]) => (
+                      <option key={key} value={key}>{label}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
@@ -343,20 +340,20 @@ const TrialEvaluationForm = () => {
 
                 <div className="space-y-4">
                   {Object.entries(evaluationData[selectedLevel]).map(([criteriaKey, criteriaData]) => (
-                    <div key={criteriaKey} className="border border-gray-200 rounded-lg p-3">
-                      <h3 className="font-semibold text-gray-800 text-sm mb-2">{criteriaData.label}</h3>
+                    <div key={criteriaKey} className="border border-gray-200 rounded-lg p-4">
+                      <h3 className="font-semibold text-gray-800 text-sm mb-3">{criteriaData.label}</h3>
                       
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-3">
                         {[1, 2, 3, 4, 5].map((rating) => (
                           <button
                             key={rating}
                             onClick={() => handleCriteriaClick(criteriaKey, rating)}
                             onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
                             onMouseLeave={() => setHoveredRating(null)}
-                            className={`px-3 py-1 rounded-md border-2 font-semibold transition text-xs ${
+                            className={`w-12 h-12 rounded-lg border-2 font-bold transition-all duration-200 text-sm flex items-center justify-center ${
                               formData.ratings[criteriaKey] === rating
-                                ? 'border-teal-500 bg-teal-100 text-teal-700'
-                                : 'border-gray-300 bg-white text-gray-700 hover:border-teal-400 hover:bg-gray-50'
+                                ? 'border-teal-500 bg-teal-500 text-white shadow-lg transform scale-105'
+                                : 'border-gray-300 bg-white text-gray-700 hover:border-teal-400 hover:bg-teal-50 hover:shadow-md hover:scale-105'
                             }`}
                           >
                             {rating}
@@ -366,7 +363,7 @@ const TrialEvaluationForm = () => {
 
                       {/* Tooltip hiển thị khi hover */}
                       {hoveredRating === `${criteriaKey}-${formData.ratings[criteriaKey]}` && formData.ratings[criteriaKey] && (
-                        <div className="mt-2 text-xs text-teal-600 font-medium bg-teal-50 px-2 py-1 rounded">
+                        <div className="mt-3 text-xs text-teal-600 font-medium bg-teal-50 px-3 py-2 rounded-lg border border-teal-200">
                           ✓ Đã chọn: {ratingLabels[formData.ratings[criteriaKey]]}
                         </div>
                       )}
