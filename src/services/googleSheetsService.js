@@ -8,85 +8,66 @@ class GoogleSheetsService {
     this.accessToken = null;
   }
 
-  // Khởi tạo Google API và xác thực
+  // Khởi tạo Google Identity Services (GIS) mới
   async initializeGoogleAPI() {
     return new Promise((resolve, reject) => {
-      // Kiểm tra nếu Google API đã được load
-      if (window.gapi && window.gapi.client) {
-        this.loadSheetsAPI().then(resolve).catch(reject);
+      console.log('🔍 Checking Google Identity Services availability...');
+      
+      // Kiểm tra nếu Google Identity Services đã được load
+      if (window.google && window.google.accounts) {
+        this.authenticateWithGIS().then(resolve).catch(reject);
         return;
       }
 
-      // Nếu chưa có, load Google API script
-      if (!window.gapi) {
-        const script = document.createElement('script');
-        script.src = 'https://apis.google.com/js/api.js';
-        script.onload = () => {
-          // Đợi một chút để gapi được khởi tạo
-          setTimeout(() => {
-            if (window.gapi) {
-              window.gapi.load('client:auth2', () => {
-                this.loadSheetsAPI().then(resolve).catch(reject);
-              });
-            } else {
-              reject(new Error('Google API failed to load'));
-            }
-          }, 1000);
-        };
-        script.onerror = () => reject(new Error('Failed to load Google API script'));
-        document.head.appendChild(script);
-      } else {
-        // Nếu gapi đã có nhưng chưa có client
-        window.gapi.load('client:auth2', () => {
-          this.loadSheetsAPI().then(resolve).catch(reject);
-        });
-      }
+      // Đợi Google Identity Services load
+      const checkGIS = () => {
+        if (window.google && window.google.accounts) {
+          console.log('✅ Google Identity Services loaded');
+          this.authenticateWithGIS().then(resolve).catch(reject);
+        } else {
+          console.log('⏳ Waiting for Google Identity Services...');
+          setTimeout(checkGIS, 100);
+        }
+      };
+      
+      checkGIS();
     });
   }
 
-  // Load Google Sheets API
-  async loadSheetsAPI() {
-    try {
-      console.log('🔍 Checking Google API availability...');
-      
-      // Kiểm tra xem gapi.client có tồn tại không
-      if (!window.gapi) {
-        throw new Error('Google API (gapi) not loaded');
-      }
-      
-      if (!window.gapi.client) {
-        throw new Error('Google API client not initialized');
-      }
+  // Xác thực với Google Identity Services
+  async authenticateWithGIS() {
+    return new Promise((resolve, reject) => {
+      try {
+        console.log('🔐 Initializing Google Identity Services...');
+        
+        // Khởi tạo Google Identity Services
+        window.google.accounts.id.initialize({
+          client_id: this.clientId,
+          callback: (response) => {
+            console.log('✅ Google Identity Services callback received');
+            console.log('🔑 JWT Token received:', response.credential ? 'Yes' : 'No');
+            
+            // Lưu JWT token
+            this.accessToken = response.credential;
+            resolve(true);
+          }
+        });
 
-      console.log('🔧 Initializing Google API client...');
-      await window.gapi.client.init({
-        apiKey: 'AIzaSyB3ZNmQMNbJv_LgPtJ17aQKG-qyNQw6Jcg', // Fallback API key
-        clientId: this.clientId,
-        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-        scope: 'https://www.googleapis.com/auth/spreadsheets'
-      });
-
-      console.log('🔐 Checking authentication status...');
-      // Kiểm tra xem user đã đăng nhập chưa
-      const authInstance = window.gapi.auth2.getAuthInstance();
-      if (!authInstance.isSignedIn.get()) {
-        console.log('🔑 User not signed in, prompting sign-in...');
-        await authInstance.signIn();
+        console.log('🔑 Prompting Google Sign-In...');
+        // Hiển thị popup đăng nhập
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            console.log('⚠️ Google Sign-In popup was not displayed or skipped');
+            reject(new Error('Google Sign-In popup was not displayed'));
+          } else {
+            console.log('✅ Google Sign-In popup displayed');
+          }
+        });
+      } catch (error) {
+        console.error('❌ Error with Google Identity Services:', error);
+        reject(error);
       }
-
-      console.log('✅ Getting access token...');
-      this.accessToken = window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
-      console.log('🎉 Google API initialized successfully');
-      return true;
-    } catch (error) {
-      console.error('❌ Error initializing Google API:', error);
-      console.error('❌ Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
-      throw error;
-    }
+    });
   }
 
   // Lấy danh sách dữ liệu đã có
@@ -96,13 +77,25 @@ class GoogleSheetsService {
         await this.initializeGoogleAPI();
       }
 
+      console.log('📊 Fetching data from Google Sheets...');
       const range = `${GOOGLE_SHEETS_CONFIG.SHEETS.DATA}!A:K`;
-      const response = await window.gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: this.sheetId,
-        range: range
+      const url = `${this.baseUrl}/${this.sheetId}/values/${range}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json'
+        }
       });
 
-      const rows = response.result.values || [];
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const rows = data.values || [];
+      
+      console.log(`✅ Fetched ${rows.length} rows from Google Sheets`);
       
       // Bỏ qua header row (row đầu tiên)
       const evaluations = rows.slice(1).map((row, index) => ({
@@ -122,7 +115,7 @@ class GoogleSheetsService {
       
       return evaluations;
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('❌ Error fetching data:', error);
       throw error;
     }
   }
@@ -134,7 +127,7 @@ class GoogleSheetsService {
         await this.initializeGoogleAPI();
       }
 
-      console.log('💾 Saving evaluation with OAuth 2.0');
+      console.log('💾 Saving evaluation with Google Identity Services');
       console.log('📊 Evaluation data:', evaluationData);
       
       // Chuyển đổi ratings thành các giá trị tương ứng
@@ -179,15 +172,28 @@ class GoogleSheetsService {
       console.log('📝 Values to save:', values);
 
       const range = `${GOOGLE_SHEETS_CONFIG.SHEETS.DATA}!A:K`;
-      const response = await window.gapi.client.sheets.spreadsheets.values.append({
-        spreadsheetId: this.sheetId,
-        range: range,
-        valueInputOption: 'USER_ENTERED',
-        values: values
+      const url = `${this.baseUrl}/${this.sheetId}/values/${range}:append?valueInputOption=USER_ENTERED`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          values: values
+        })
       });
       
-      console.log('✅ Save successful:', response.result);
-      return response.result;
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Save failed:', errorText);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('✅ Save successful:', result);
+      return result;
     } catch (error) {
       console.error('❌ Error saving evaluation:', error);
       throw error;
@@ -201,14 +207,24 @@ class GoogleSheetsService {
         await this.initializeGoogleAPI();
       }
 
+      console.log('🔍 Testing Google Sheets connection...');
       const range = `${GOOGLE_SHEETS_CONFIG.SHEETS.DATA}!A1`;
-      const response = await window.gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: this.sheetId,
-        range: range
+      const url = `${this.baseUrl}/${this.sheetId}/values/${range}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json'
+        }
       });
       
-      console.log('✅ Connection successful with OAuth 2.0');
-      return response.result !== undefined;
+      if (!response.ok) {
+        console.error('❌ Connection failed:', response.status);
+        return false;
+      }
+      
+      console.log('✅ Connection successful with Google Identity Services');
+      return true;
     } catch (error) {
       console.error('❌ Connection test failed:', error);
       return false;
