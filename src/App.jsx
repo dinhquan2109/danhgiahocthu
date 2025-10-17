@@ -270,7 +270,7 @@ const TrialEvaluationForm = () => {
               <img 
                 src="https://axllpuaybdzubfmsfkws.supabase.co/storage/v1/object/sign/testsiteaudio_HSK1_2/logoaloha.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9mMTcyMjBlMC00MTM3LTRmMGEtYTg5OC04NTk1ODhmOTdiYWUiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ0ZXN0c2l0ZWF1ZGlvX0hTSzFfMi9sb2dvYWxvaGEuanBnIiwiaWF0IjoxNzYwNzI0Mzg2LCJleHAiOjE5MTg0MDQzODZ9.Sah42nsGOjJgwVUX12SraxiWLtslG43Qw-RqTCh7aYQ" 
                 alt="Logo" 
-                className="w-20 h-20 rounded-full object-cover shadow-lg"
+                className="w-24 h-24 rounded-full object-cover shadow-lg"
               />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-1">
@@ -287,7 +287,7 @@ const TrialEvaluationForm = () => {
               <div className="flex items-center gap-2 mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-yellow-500 text-2xl">★</span>
-                  <h2 className="text-base font-bold text-gray-800">THÔNG TIN HỌC VIÊN</h2>
+                  <h2 className="text-base font-bold text-purple-800">THÔNG TIN HỌC VIÊN</h2>
                 </div>
               </div>
 
@@ -358,7 +358,7 @@ const TrialEvaluationForm = () => {
                                 onClick={() => handleCriteriaClick(criteriaKey, rating)}
                                 onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
                                 onMouseLeave={() => setHoveredRating(null)}
-                                className={`w-full text-left px-3 py-1 rounded-md border-2 transition-all duration-200 text-sm ${
+                                className={`w-full text-left px-4 py-0.5 rounded-md border-2 transition-all duration-200 text-sm ${
                                   formData.ratings[criteriaKey] === rating
                                     ? 'border-purple-500 bg-purple-100 text-purple-700'
                                     : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:bg-purple-50'
