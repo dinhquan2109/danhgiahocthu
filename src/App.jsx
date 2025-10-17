@@ -281,9 +281,8 @@ const TrialEvaluationForm = () => {
             {/* Thông tin học viên */}
             <div className="bg-white rounded-xl p-4 mb-4">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-6 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded"></div>
                 <div className="flex items-center gap-2">
-                  <span className="text-yellow-500 text-lg">★</span>
+                  <span className="text-yellow-500 text-2xl">★</span>
                   <h2 className="text-base font-bold text-gray-800">THÔNG TIN HỌC VIÊN</h2>
                 </div>
               </div>
@@ -333,8 +332,11 @@ const TrialEvaluationForm = () => {
             {selectedLevel && (
               <div className="bg-white rounded-xl p-4 mb-4">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="bg-purple-500 text-white px-3 py-1 rounded-lg text-sm font-bold">
-                    ĐÁNH GIÁ CHI TIẾT
+                  <div className="flex items-center gap-2">
+                    <span className="text-yellow-500 text-2xl">★</span>
+                    <div className="bg-purple-500 text-white px-3 py-1 rounded-lg text-sm font-bold">
+                      ĐÁNH GIÁ CHI TIẾT
+                    </div>
                   </div>
                 </div>
 
@@ -342,17 +344,17 @@ const TrialEvaluationForm = () => {
                   {Object.entries(evaluationData[selectedLevel]).map(([criteriaKey, criteriaData]) => (
                     <div key={criteriaKey} className="relative flex">
                       {/* Phần bên trái - Danh sách lựa chọn */}
-                      <div className="w-2/3 pr-4">
+                      <div className="w-1/2 pr-4">
                         <h3 className="font-bold text-gray-800 text-base mb-3">{criteriaData.label}</h3>
                         
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                           {[1, 2, 3, 4, 5].map((rating) => (
                             <div key={rating} className="relative group">
                               <button
                                 onClick={() => handleCriteriaClick(criteriaKey, rating)}
                                 onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
                                 onMouseLeave={() => setHoveredRating(null)}
-                                className={`w-full text-left px-3 py-2 rounded-lg border-2 transition-all duration-200 text-sm ${
+                                className={`w-full text-left px-3 py-1 rounded-lg border-2 transition-all duration-200 text-sm ${
                                   formData.ratings[criteriaKey] === rating
                                     ? 'border-purple-500 bg-purple-100 text-purple-700'
                                     : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:bg-purple-50'
@@ -366,13 +368,15 @@ const TrialEvaluationForm = () => {
                       </div>
 
                       {/* Phần bên phải - Hiển thị mô tả khi hover */}
-                      <div className="w-1/3 pl-4">
+                      <div className="w-1/2 pl-4">
                         {hoveredRating && hoveredRating.startsWith(`${criteriaKey}-`) && (
                           <div className="sticky top-4">
-                            <div className="bg-white border-2 border-gray-300 rounded-2xl p-4 shadow-lg">
+                            <div className="bg-white border-2 border-gray-300 rounded-2xl p-4 shadow-lg relative">
                               <div className="text-sm text-gray-700 leading-relaxed">
                                 {criteriaData.descriptions[parseInt(hoveredRating.split('-')[1]) - 1]}
                               </div>
+                              {/* Speech bubble tail */}
+                              <div className="absolute -left-2 top-6 w-4 h-4 bg-white border-l-2 border-b-2 border-gray-300 transform rotate-45"></div>
                             </div>
                           </div>
                         )}
@@ -408,7 +412,7 @@ const TrialEvaluationForm = () => {
             <button
               onClick={handleSaveEvaluation}
               disabled={loading || !selectedLevel}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold hover:from-green-600 hover:to-emerald-700 transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-orange-400 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-orange-500 hover:to-purple-700 transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <Save className="w-4 h-4" />
               {loading ? 'ĐANG LƯU...' : 'GỬI ĐÁNH GIÁ'}
