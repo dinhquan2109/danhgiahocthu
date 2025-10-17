@@ -283,7 +283,7 @@ const TrialEvaluationForm = () => {
         <div className="w-full">
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-xl p-4 border-2 border-white">
             {/* Thông tin học viên */}
-            <div className="bg-white rounded-xl p-4 mb-4">
+            <div className="bg-purple-50 rounded-xl p-4 mb-4 border border-purple-200">
               <div className="flex items-center gap-2 mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-yellow-500 text-2xl">★</span>
@@ -334,7 +334,7 @@ const TrialEvaluationForm = () => {
 
             {/* Đánh giá chi tiết */}
             {selectedLevel && (
-              <div className="bg-white rounded-xl p-4 mb-4">
+              <div className="bg-purple-50 rounded-xl p-4 mb-4 border border-purple-200">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="flex items-center gap-2">
                     <span className="text-yellow-500 text-2xl">★</span>
@@ -351,14 +351,14 @@ const TrialEvaluationForm = () => {
                       <div className="w-1/2 pr-4">
                         <h3 className="font-bold text-gray-800 text-base mb-3">{criteriaData.label}</h3>
                         
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                           {[1, 2, 3, 4, 5].map((rating) => (
                             <div key={rating} className="relative group">
                               <button
                                 onClick={() => handleCriteriaClick(criteriaKey, rating)}
                                 onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
                                 onMouseLeave={() => setHoveredRating(null)}
-                                className={`w-full text-left px-4 py-2 rounded-lg border-2 transition-all duration-200 text-base ${
+                                className={`w-full text-left px-3 py-1 rounded-md border-2 transition-all duration-200 text-sm ${
                                   formData.ratings[criteriaKey] === rating
                                     ? 'border-purple-500 bg-purple-100 text-purple-700'
                                     : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:bg-purple-50'
