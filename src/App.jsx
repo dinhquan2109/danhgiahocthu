@@ -263,167 +263,162 @@ const TrialEvaluationForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 py-8 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 py-4 px-4 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-full opacity-10">
         <div className="absolute top-20 left-10 w-40 h-40 bg-yellow-300 rounded-full blur-3xl"></div>
         <div className="absolute top-40 right-20 w-32 h-32 bg-orange-300 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-1/4 w-48 h-48 bg-blue-300 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
-        <div className="bg-white rounded-3xl shadow-xl p-6 mb-6 border-t-8 border-emerald-500">
+      <div className="max-w-5xl mx-auto relative z-10">
+        <div className="bg-white rounded-2xl shadow-xl p-4 mb-4 border-t-4 border-emerald-500">
           <div className="text-center">
-            <div className="inline-block bg-gradient-to-br from-emerald-500 to-teal-500 p-3 rounded-full mb-3 shadow-lg">
-              <FileText className="w-8 h-8 text-white" />
+            <div className="inline-block bg-gradient-to-br from-emerald-500 to-teal-500 p-2 rounded-full mb-2 shadow-lg">
+              <FileText className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-1">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-1">
               PHIẾU ĐÁNH GIÁ HỌC THỬ
             </h1>
-            <p className="text-gray-600 text-sm">Hệ thống đánh giá nội bộ</p>
+            <p className="text-gray-600 text-xs">Hệ thống đánh giá nội bộ</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
-          {/* Phần form bên trái */}
-          <div className="col-span-3 lg:col-span-2">
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl shadow-xl p-6 border-2 border-white">
-              {/* Thông tin học viên */}
-              <div className="bg-white rounded-2xl p-6 mb-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded"></div>
-                  <h2 className="text-lg font-bold text-gray-800">THÔNG TIN HỌC VIÊN</h2>
-                </div>
+        <div className="w-full">
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-xl p-4 border-2 border-white">
+            {/* Thông tin học viên */}
+            <div className="bg-white rounded-xl p-4 mb-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded"></div>
+                <h2 className="text-base font-bold text-gray-800">THÔNG TIN HỌC VIÊN</h2>
+              </div>
 
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    value={formData.studentName}
-                    onChange={(e) => setFormData({ ...formData, studentName: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none text-sm"
-                    placeholder="* Họ tên học viên"
-                  />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  value={formData.studentName}
+                  onChange={(e) => setFormData({ ...formData, studentName: e.target.value })}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none text-sm"
+                  placeholder="* Họ tên học viên"
+                />
 
-                  <input
-                    type="text"
-                    value={formData.classCode}
-                    onChange={(e) => setFormData({ ...formData, classCode: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none text-sm"
-                    placeholder="* Mã lớp"
-                  />
+                <input
+                  type="text"
+                  value={formData.classCode}
+                  onChange={(e) => setFormData({ ...formData, classCode: e.target.value })}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none text-sm"
+                  placeholder="* Mã lớp"
+                />
 
-                  <input
-                    type="text"
-                    value={formData.teacherName}
-                    onChange={(e) => setFormData({ ...formData, teacherName: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none text-sm"
-                    placeholder="* Tên giáo viên"
-                  />
+                <input
+                  type="text"
+                  value={formData.teacherName}
+                  onChange={(e) => setFormData({ ...formData, teacherName: e.target.value })}
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none text-sm"
+                  placeholder="* Tên giáo viên"
+                />
 
-                  {/* Trình độ lớp học */}
-                  <div>
-                    <label className="block text-sm font-bold text-gray-800 mb-3">* TRÌNH ĐỘ LỚP HỌC</label>
-                    <div className="border-2 border-gray-200 rounded-xl overflow-hidden">
-                      <select
-                        value={selectedLevel}
-                        onChange={(e) => handleLevelSelect(e.target.value)}
-                        className="w-full px-4 py-3 focus:outline-none text-sm font-semibold text-gray-800 bg-white"
-                      >
-                        <option value="">Chọn trình độ...</option>
-                        {Object.entries(levels).map(([key, label]) => (
-                          <option key={key} value={key}>{label}</option>
-                        ))}
-                      </select>
-                    </div>
+                {/* Trình độ lớp học */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-800 mb-2">* TRÌNH ĐỘ LỚP HỌC</label>
+                  <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
+                    <select
+                      value={selectedLevel}
+                      onChange={(e) => handleLevelSelect(e.target.value)}
+                      className="w-full px-3 py-2 focus:outline-none text-sm font-semibold text-gray-800 bg-white"
+                    >
+                      <option value="">Chọn trình độ...</option>
+                      {Object.entries(levels).map(([key, label]) => (
+                        <option key={key} value={key}>{label}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
-
-              {/* Đánh giá chi tiết */}
-              {selectedLevel && (
-                <div className="bg-white rounded-2xl p-6">
-                  <h2 className="text-lg font-bold text-gray-800 mb-6">ĐÁNH GIÁ CHI TIẾT</h2>
-
-                  <div className="space-y-6">
-                    {Object.entries(evaluationData[selectedLevel]).map(([criteriaKey, criteriaData]) => (
-                      <div key={criteriaKey}>
-                        <h3 className="font-semibold text-gray-800 text-sm mb-3">{criteriaData.label}</h3>
-                        
-                        <div className="flex flex-wrap gap-2">
-                          {[1, 2, 3, 4, 5].map((rating) => (
-                            <button
-                              key={rating}
-                              onClick={() => handleCriteriaClick(criteriaKey, rating)}
-                              onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
-                              onMouseLeave={() => setHoveredRating(null)}
-                              className={`px-4 py-2 rounded-lg border-2 font-semibold transition text-sm ${
-                                formData.ratings[criteriaKey] === rating
-                                  ? 'border-teal-500 bg-teal-100 text-teal-700'
-                                  : 'border-gray-300 bg-white text-gray-700 hover:border-teal-400 hover:bg-gray-50'
-                              }`}
-                            >
-                              {rating}
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Tooltip hiển thị khi hover */}
-                        {hoveredRating === `${criteriaKey}-${formData.ratings[criteriaKey]}` && formData.ratings[criteriaKey] && (
-                          <div className="mt-2 text-xs text-teal-600 font-medium bg-teal-50 px-3 py-2 rounded-lg">
-                            ✓ Đã chọn: {ratingLabels[formData.ratings[criteriaKey]]}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Status Message */}
-              {saveStatus && (
-                <div className={`mt-4 px-4 py-3 rounded-xl flex items-center gap-2 text-sm font-medium ${
-                  saveStatus === 'success'
-                    ? 'bg-green-100 border-2 border-green-300 text-green-700'
-                    : 'bg-red-100 border-2 border-red-300 text-red-700'
-                }`}>
-                  {saveStatus === 'success' ? (
-                    <>
-                      <CheckCircle className="w-5 h-5" />
-                      Lưu đánh giá thành công!
-                    </>
-                  ) : (
-                    <>
-                      <AlertCircle className="w-5 h-5" />
-                      Lỗi! Vui lòng điền đủ thông tin (*) và chọn trình độ, đánh giá
-                    </>
-                  )}
-                </div>
-              )}
-
-              {/* Save Button */}
-              <button
-                onClick={handleSaveEvaluation}
-                disabled={loading || !selectedLevel}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-2xl font-bold hover:from-green-600 hover:to-emerald-700 transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
-              >
-                <Save className="w-5 h-5" />
-                {loading ? 'ĐANG LƯU...' : 'GỬI ĐÁNH GIÁ'}
-              </button>
             </div>
-          </div>
 
-          {/* Chi tiết hiển thị bên phải - Overlay khi click */}
+            {/* Đánh giá chi tiết */}
+            {selectedLevel && (
+              <div className="bg-white rounded-xl p-4 mb-4">
+                <h2 className="text-base font-bold text-gray-800 mb-4">ĐÁNH GIÁ CHI TIẾT</h2>
+
+                <div className="space-y-4">
+                  {Object.entries(evaluationData[selectedLevel]).map(([criteriaKey, criteriaData]) => (
+                    <div key={criteriaKey} className="border border-gray-200 rounded-lg p-3">
+                      <h3 className="font-semibold text-gray-800 text-sm mb-2">{criteriaData.label}</h3>
+                      
+                      <div className="flex flex-wrap gap-2">
+                        {[1, 2, 3, 4, 5].map((rating) => (
+                          <button
+                            key={rating}
+                            onClick={() => handleCriteriaClick(criteriaKey, rating)}
+                            onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
+                            onMouseLeave={() => setHoveredRating(null)}
+                            className={`px-3 py-1 rounded-md border-2 font-semibold transition text-xs ${
+                              formData.ratings[criteriaKey] === rating
+                                ? 'border-teal-500 bg-teal-100 text-teal-700'
+                                : 'border-gray-300 bg-white text-gray-700 hover:border-teal-400 hover:bg-gray-50'
+                            }`}
+                          >
+                            {rating}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Tooltip hiển thị khi hover */}
+                      {hoveredRating === `${criteriaKey}-${formData.ratings[criteriaKey]}` && formData.ratings[criteriaKey] && (
+                        <div className="mt-2 text-xs text-teal-600 font-medium bg-teal-50 px-2 py-1 rounded">
+                          ✓ Đã chọn: {ratingLabels[formData.ratings[criteriaKey]]}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Status Message */}
+            {saveStatus && (
+              <div className={`mb-4 px-3 py-2 rounded-lg flex items-center gap-2 text-xs font-medium ${
+                saveStatus === 'success'
+                  ? 'bg-green-100 border border-green-300 text-green-700'
+                  : 'bg-red-100 border border-red-300 text-red-700'
+              }`}>
+                {saveStatus === 'success' ? (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    Lưu đánh giá thành công!
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle className="w-4 h-4" />
+                    Lỗi! Vui lòng điền đủ thông tin (*) và chọn trình độ, đánh giá
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Save Button */}
+            <button
+              onClick={handleSaveEvaluation}
+              disabled={loading || !selectedLevel}
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold hover:from-green-600 hover:to-emerald-700 transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              {loading ? 'ĐANG LƯU...' : 'GỬI ĐÁNH GIÁ'}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Modal Popup hiển thị bên cạnh */}
       {showModal && selectedCriteria && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2">
           <div className="bg-black/20 absolute inset-0" onClick={() => setShowModal(false)}></div>
           
-          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto relative z-50">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-start">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto relative z-50">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-3 flex justify-between items-start">
               <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-2">
+                <h3 className="text-base font-bold text-gray-800 mb-1">
                   {evaluationData[selectedCriteria.level][selectedCriteria.key].label}
                 </h3>
                 <p className="text-xs text-gray-600">Chọn mức độ từ 1 đến 5</p>
@@ -432,23 +427,23 @@ const TrialEvaluationForm = () => {
                 onClick={() => setShowModal(false)}
                 className="p-1 hover:bg-gray-100 rounded-lg transition"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <X className="w-4 h-4 text-gray-600" />
               </button>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="p-4 space-y-3">
               {evaluationData[selectedCriteria.level][selectedCriteria.key].descriptions.map((desc, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleRatingSelect(idx + 1)}
-                  className={`w-full p-4 rounded-xl border-2 text-left transition ${
+                  className={`w-full p-3 rounded-lg border-2 text-left transition ${
                     formData.ratings[selectedCriteria.key] === idx + 1
                       ? 'border-teal-500 bg-teal-50'
                       : 'border-gray-200 hover:border-teal-400 hover:bg-gray-50'
                   }`}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className={`font-bold text-lg w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm ${
+                  <div className="flex items-start gap-2">
+                    <div className={`font-bold text-sm w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       formData.ratings[selectedCriteria.key] === idx + 1
                         ? 'bg-teal-500 text-white'
                         : 'bg-gray-200 text-gray-700'
@@ -456,7 +451,7 @@ const TrialEvaluationForm = () => {
                       {idx + 1}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-gray-800 text-sm mb-2">
+                      <p className="font-semibold text-gray-800 text-xs mb-1">
                         {ratingLabels[idx + 1]}
                       </p>
                       <p className="text-xs text-gray-600 leading-relaxed">
