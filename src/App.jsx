@@ -9,6 +9,7 @@ const TrialEvaluationForm = () => {
   const [hoveredRating, setHoveredRating] = useState(null);
   const [availableClasses, setAvailableClasses] = useState([]);
   const [connectionStatus, setConnectionStatus] = useState('checking');
+  const [validationError, setValidationError] = useState('');
 
   const levels = {
     'I': 'I. Cho người mới bắt đầu',
@@ -200,6 +201,8 @@ const TrialEvaluationForm = () => {
       ratings: {}
     });
     setSelectedLevel(levelKey);
+    // Clear validation error when level is selected
+    setValidationError('');
   };
 
   const handleCriteriaClick = (criteriaKey, ratingValue) => {
@@ -210,6 +213,8 @@ const TrialEvaluationForm = () => {
         [criteriaKey]: ratingValue
       }
     }));
+    // Clear validation error when rating is selected
+    setValidationError('');
   };
 
 
@@ -237,15 +242,40 @@ const TrialEvaluationForm = () => {
   }, []);
 
   const handleSaveEvaluation = async () => {
-    if (!formData.studentName || !formData.classCode || !formData.teacherName || !selectedLevel) {
+    // Debug: Log thông tin để kiểm tra
+    console.log('Form Data:', formData);
+    console.log('Selected Level:', selectedLevel);
+    console.log('Ratings:', formData.ratings);
+
+    // Reset validation error
+    setValidationError('');
+
+    // Kiểm tra thông tin cơ bản
+    if (!formData.studentName || !formData.classCode || !formData.teacherName) {
+      const missingFields = [];
+      if (!formData.studentName) missingFields.push('Họ tên học viên');
+      if (!formData.classCode) missingFields.push('Mã lớp');
+      if (!formData.teacherName) missingFields.push('Tên giáo viên');
+      
+      setValidationError(`Vui lòng điền đầy đủ: ${missingFields.join(', ')}`);
       setSaveStatus('error');
-      setTimeout(() => setSaveStatus(''), 3000);
+      setTimeout(() => setSaveStatus(''), 5000);
       return;
     }
 
-    if (Object.keys(formData.ratings).length === 0) {
+    // Kiểm tra trình độ đã chọn
+    if (!selectedLevel) {
+      setValidationError('Vui lòng chọn trình độ lớp học');
       setSaveStatus('error');
-      setTimeout(() => setSaveStatus(''), 3000);
+      setTimeout(() => setSaveStatus(''), 5000);
+      return;
+    }
+
+    // Kiểm tra đã đánh giá ít nhất 1 tiêu chí
+    if (Object.keys(formData.ratings).length === 0) {
+      setValidationError('Vui lòng đánh giá ít nhất 1 tiêu chí');
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus(''), 5000);
       return;
     }
 
@@ -477,7 +507,7 @@ const TrialEvaluationForm = () => {
                 ) : (
                   <>
                     <AlertCircle className="w-4 h-4" />
-                    Lỗi! Vui lòng điền đủ thông tin (*) và chọn trình độ, đánh giá
+                    {validationError || 'Lỗi! Vui lòng kiểm tra lại thông tin'}
                   </>
                 )}
               </div>
