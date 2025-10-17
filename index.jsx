@@ -1,0 +1,477 @@
+import React, { useState } from 'react';
+import { FileText, Save, AlertCircle, CheckCircle, X } from 'lucide-react';
+
+const TrialEvaluationForm = () => {
+  const [loading, setLoading] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('');
+  const [selectedLevel, setSelectedLevel] = useState('');
+  const [selectedCriteria, setSelectedCriteria] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [hoveredRating, setHoveredRating] = useState(null);
+
+  const levels = {
+    'I': 'I. Cho người mới bắt đầu',
+    'II': 'II. Cho người đã có nền tảng',
+    'III': 'III. Khoá giao tiếp cho người mới bắt đầu'
+  };
+
+  const ratingLabels = {
+    1: 'Rất hạn chế',
+    2: 'Yếu',
+    3: 'Trung bình',
+    4: 'Tốt',
+    5: 'Rất tốt/Tiềm năng cao'
+  };
+
+  const evaluationData = {
+    'I': {
+      'focus': {
+        label: 'Mức độ tập trung và hợp tác trong buổi học',
+        descriptions: [
+          'Học viên còn rụt rè, chưa tương tác nhiều với giáo viên, cần hỗ trợ và khơi gợi thêm.',
+          'Học viên có tham gia nhưng thiếu chủ động, cần thêm động lực để duy trì sự tập trung.',
+          'Học viên hợp tác ở mức ổn, có lúc mất tập trung nhưng nhìn chung theo được buổi học.',
+          'Học viên chủ động hợp tác, phản hồi tốt khi được hỏi, tinh thần học nghiêm túc.',
+          'Học viên rất tập trung, hợp tác tích cực, tạo không khí học vui vẻ và hiệu quả.'
+        ]
+      },
+      'comprehension': {
+        label: 'Phản ứng và mức độ tiếp thu với nội dung mới',
+        descriptions: [
+          'Học viên chưa bắt nhịp được với nội dung, cần giáo viên hỗ trợ chậm và lặp lại nhiều lần.',
+          'Học viên hiểu chậm, đôi khi phản ứng muộn, nhưng có cố gắng ghi nhớ.',
+          'Học viên nắm được phần chính, tuy còn chậm nhưng có tiến bộ rõ trong buổi học.',
+          'Học viên phản ứng nhanh, hiểu ý giáo viên, bắt chước và ghi nhớ khá tốt.',
+          'Học viên phản ứng nhanh, ghi nhớ tốt, thể hiện khả năng tiếp thu nổi bật.'
+        ]
+      },
+      'pronunciation': {
+        label: 'Phát âm và bắt chước tiếng Trung',
+        descriptions: [
+          'Học viên gặp khó khăn khi phát âm, cần nhiều thời gian làm quen ngữ âm.',
+          'Học viên bắt chước được nhưng chưa chính xác, cần luyện thêm phần thanh điệu.',
+          'Học viên có thể phát âm đúng vài âm cơ bản, đã biết điều chỉnh theo hướng dẫn.',
+          'Học viên phát âm khá tốt cho người mới, có khả năng nhận diện âm thanh chuẩn.',
+          'Học viên phát âm tốt, tiếp thu nhanh, rất có năng khiếu ngôn ngữ.'
+        ]
+      },
+      'memory': {
+        label: 'Khả năng ghi nhớ và phản hồi lại từ/câu đơn giản',
+        descriptions: [
+          'Học viên cần thêm thời gian và phương pháp ghi nhớ phù hợp.',
+          'Học viên có thể nhắc lại nhưng còn nhầm lẫn, cần củng cố thêm.',
+          'Học viên nhớ được phần cơ bản, cần luyện thêm để ghi nhớ lâu hơn.',
+          'Học viên ghi nhớ nhanh, phản hồi tốt, đã biết liên hệ giữa âm – nghĩa.',
+          'Học viên phản hồi nhanh, ghi nhớ tốt, khả năng tiếp thu từ vựng rất tốt.'
+        ]
+      },
+      'attitude': {
+        label: 'Thái độ học tập/ Năng khiếu học tập',
+        descriptions: [
+          'Học viên chưa sẵn sàng về tinh thần học, cần thời gian làm quen môi trường học.',
+          'Học viên hơi thụ động, cần được khích lệ thêm để tạo hứng thú học tập.',
+          'Học viên hợp tác tốt khi được khuyến khích, có nền tảng để phát triển thêm.',
+          'Học viên hứng thú với bài học, chủ động tương tác, tiềm năng phát triển tốt.',
+          'Học viên có thái độ học tập xuất sắc, rất tiềm năng để tiến bộ nhanh.'
+        ]
+      }
+    },
+    'II': {
+      'communication': {
+        label: 'Giao tiếp & phản xạ',
+        descriptions: [
+          'Học viên cần thêm thời gian để quen với phản xạ giao tiếp.',
+          'Có nền tảng cơ bản, nên luyện phản ứng nhanh hơn.',
+          'Phản xạ khá ổn, cần luyện thêm để nói trôi chảy hơn.',
+          'Tương tác tốt, giao tiếp khá linh hoạt.',
+          'Rất tự tin và tự nhiên khi giao tiếp, khả năng phản xạ xuất sắc.'
+        ]
+      },
+      'pronunciation': {
+        label: 'Phát âm & ngữ pháp',
+        descriptions: [
+          'Cần tập trung sửa phát âm và làm quen với cấu trúc câu.',
+          'Có tiến bộ, nên chú ý hơn vào thanh điệu và ngữ pháp.',
+          'Phát âm khá ổn, nên luyện thêm để đạt độ tự nhiên.',
+          'Ngữ pháp và phát âm tốt, chỉ cần trau chuốt thêm.',
+          'Sử dụng tiếng Trung rất chuẩn, phát âm và ngữ pháp ổn định.'
+        ]
+      },
+      'listening': {
+        label: 'Nghe hiểu',
+        descriptions: [
+          'Nên nghe thêm các đoạn ngắn chậm để luyện phản xạ.',
+          'Hiểu được từ chính, cần luyện thêm khả năng đoán ý.',
+          'Nghe ổn, chỉ cần cải thiện tốc độ phản hồi.',
+          'Khả năng nghe tốt, hiểu đa số chủ đề thường gặp.',
+          'Nghe hiểu xuất sắc, có thể bắt kịp tốc độ tự nhiên hoàn toàn.'
+        ]
+      },
+      'vocabulary': {
+        label: 'Từ vựng & cách diễn đạt',
+        descriptions: [
+          'Cần mở rộng thêm vốn từ vựng theo chủ đề.',
+          'Biết nhiều từ cơ bản, nên luyện ghép câu và mở rộng chủ đề.',
+          'Dùng từ ổn, có thể luyện thêm để diễn đạt phong phú hơn.',
+          'Cách diễn đạt tự nhiên, vốn từ khá tốt.',
+          'Biểu đạt linh hoạt, vốn từ phong phú và đa dạng.'
+        ]
+      },
+      'attitude': {
+        label: 'Thái độ & tinh thần học',
+        descriptions: [
+          'Cần khuyến khích để tự tin hơn khi học.',
+          'Có tiềm năng, nên tập trung hơn trong giờ học.',
+          'Thái độ học tốt, nên duy trì đều đặn.',
+          'Chủ động và tích cực, tiếp thu nhanh.',
+          'Rất chủ động, tinh thần học nghiêm túc và cầu tiến.'
+        ]
+      }
+    },
+    'III': {
+      'communication': {
+        label: 'Giao tiếp & phản xạ',
+        descriptions: [
+          'Cần thêm thời gian làm quen với phản xạ giao tiếp.',
+          'Đã hiểu ý, nên luyện phản ứng nhanh và rõ hơn.',
+          'Biết phản ứng cơ bản, cần luyện nói to và trôi chảy hơn.',
+          'Phản xạ khá tốt, giao tiếp tự nhiên.',
+          'Tự tin, phản xạ tốt, rất phù hợp học giao tiếp.'
+        ]
+      },
+      'pronunciation': {
+        label: 'Phát âm & thanh điệu',
+        descriptions: [
+          'Phát âm sai nhiều, chưa quen thanh điệu.',
+          'Biết cách phát âm nhưng còn sai hoặc chưa rõ.',
+          'Phát âm dễ hiểu, đôi khi sai thanh điệu.',
+          'Phát âm chuẩn hơn, có ngữ điệu rõ.',
+          'Phát âm chuẩn, rõ ràng, nói tự nhiên.'
+        ]
+      },
+      'listening': {
+        label: 'Nghe hiểu',
+        descriptions: [
+          'Cần nghe chậm để làm quen với âm thanh tiếng Trung.',
+          'Đã nghe ra vài từ, cần luyện thêm.',
+          'Nghe khá ổn, cần phản ứng nhanh hơn.',
+          'Nghe tốt, hiểu ý chính.',
+          'Nghe hiểu tốt, phản xạ nhanh và chính xác.'
+        ]
+      },
+      'vocabulary': {
+        label: 'Từ vựng & cách diễn đạt',
+        descriptions: [
+          'Cần học thêm từ vựng cơ bản.',
+          'Có nền tảng, nên luyện ghép từ thành câu.',
+          'Dùng câu ngắn khá tốt, cần nói đầy đủ hơn.',
+          'Vốn từ ổn, diễn đạt tự nhiên.',
+          'Vốn từ tốt, nói trôi chảy, rõ ràng.'
+        ]
+      },
+      'attitude': {
+        label: 'Thái độ & tinh thần học',
+        descriptions: [
+          'Còn ngại nói, ít tương tác.',
+          'Có tham gia nhưng chưa đều.',
+          'Hợp tác tốt, chịu khó học.',
+          'Chủ động, tích cực hỏi – trả lời.',
+          'Rất chủ động, tự tin và có mục tiêu học rõ ràng.'
+        ]
+      }
+    }
+  };
+
+  const [formData, setFormData] = useState({
+    studentName: '',
+    classCode: '',
+    teacherName: '',
+    level: '',
+    ratings: {}
+  });
+
+  const handleLevelSelect = (levelKey) => {
+    setFormData({
+      studentName: formData.studentName,
+      classCode: formData.classCode,
+      teacherName: formData.teacherName,
+      level: levelKey,
+      ratings: {}
+    });
+    setSelectedLevel(levelKey);
+  };
+
+  const handleCriteriaClick = (criteriaKey, ratingValue) => {
+    setSelectedCriteria({ key: criteriaKey, level: selectedLevel, rating: ratingValue });
+    setShowModal(true);
+  };
+
+  const handleRatingSelect = (ratingValue) => {
+    setFormData(prev => ({
+      ...prev,
+      ratings: {
+        ...prev.ratings,
+        [selectedCriteria.key]: ratingValue
+      }
+    }));
+    setShowModal(false);
+  };
+
+  const handleSaveEvaluation = async () => {
+    if (!formData.studentName || !formData.classCode || !formData.teacherName || !formData.level) {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus(''), 3000);
+      return;
+    }
+
+    if (Object.keys(formData.ratings).length === 0) {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus(''), 3000);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const evaluation = {
+        id: Date.now(),
+        ...formData,
+        savedAt: new Date().toISOString()
+      };
+
+      const existing = JSON.parse(localStorage.getItem('evaluationsList') || '[]');
+      const updated = [...existing, evaluation];
+      localStorage.setItem('evaluationsList', JSON.stringify(updated));
+
+      setSaveStatus('success');
+      setTimeout(() => {
+        setFormData({
+          studentName: '',
+          classCode: '',
+          teacherName: '',
+          level: '',
+          ratings: {}
+        });
+        setSelectedLevel('');
+        setSaveStatus('');
+      }, 1500);
+    } catch (error) {
+      console.error('Error saving:', error);
+      setSaveStatus('error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 py-8 px-4 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full opacity-10">
+        <div className="absolute top-20 left-10 w-40 h-40 bg-yellow-300 rounded-full blur-3xl"></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-orange-300 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-1/4 w-48 h-48 bg-blue-300 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="bg-white rounded-3xl shadow-xl p-6 mb-6 border-t-8 border-emerald-500">
+          <div className="text-center">
+            <div className="inline-block bg-gradient-to-br from-emerald-500 to-teal-500 p-3 rounded-full mb-3 shadow-lg">
+              <FileText className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-1">
+              PHIẾU ĐÁNH GIÁ HỌC THỬ
+            </h1>
+            <p className="text-gray-600 text-sm">Hệ thống đánh giá nội bộ</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-6">
+          {/* Phần form bên trái */}
+          <div className="col-span-3 lg:col-span-2">
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl shadow-xl p-6 border-2 border-white">
+              {/* Thông tin học viên */}
+              <div className="bg-white rounded-2xl p-6 mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded"></div>
+                  <h2 className="text-lg font-bold text-gray-800">THÔNG TIN HỌC VIÊN</h2>
+                </div>
+
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    value={formData.studentName}
+                    onChange={(e) => setFormData({ ...formData, studentName: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none text-sm"
+                    placeholder="* Họ tên học viên"
+                  />
+
+                  <input
+                    type="text"
+                    value={formData.classCode}
+                    onChange={(e) => setFormData({ ...formData, classCode: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none text-sm"
+                    placeholder="* Mã lớp"
+                  />
+
+                  <input
+                    type="text"
+                    value={formData.teacherName}
+                    onChange={(e) => setFormData({ ...formData, teacherName: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none text-sm"
+                    placeholder="* Tên giáo viên"
+                  />
+
+                  {/* Trình độ lớp học */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-3">* TRÌNH ĐỘ LỚP HỌC</label>
+                    <div className="border-2 border-gray-200 rounded-xl overflow-hidden">
+                      <select
+                        value={selectedLevel}
+                        onChange={(e) => handleLevelSelect(e.target.value)}
+                        className="w-full px-4 py-3 focus:outline-none text-sm font-semibold text-gray-800 bg-white"
+                      >
+                        <option value="">Chọn trình độ...</option>
+                        {Object.entries(levels).map(([key, label]) => (
+                          <option key={key} value={key}>{label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Đánh giá chi tiết */}
+              {selectedLevel && (
+                <div className="bg-white rounded-2xl p-6">
+                  <h2 className="text-lg font-bold text-gray-800 mb-6">ĐÁNH GIÁ CHI TIẾT</h2>
+
+                  <div className="space-y-6">
+                    {Object.entries(evaluationData[selectedLevel]).map(([criteriaKey, criteriaData]) => (
+                      <div key={criteriaKey}>
+                        <h3 className="font-semibold text-gray-800 text-sm mb-3">{criteriaData.label}</h3>
+                        
+                        <div className="flex flex-wrap gap-2">
+                          {[1, 2, 3, 4, 5].map((rating) => (
+                            <button
+                              key={rating}
+                              onClick={() => handleCriteriaClick(criteriaKey, rating)}
+                              onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
+                              onMouseLeave={() => setHoveredRating(null)}
+                              className={`px-4 py-2 rounded-lg border-2 font-semibold transition text-sm ${
+                                formData.ratings[criteriaKey] === rating
+                                  ? 'border-teal-500 bg-teal-100 text-teal-700'
+                                  : 'border-gray-300 bg-white text-gray-700 hover:border-teal-400 hover:bg-gray-50'
+                              }`}
+                            >
+                              {rating}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Tooltip hiển thị khi hover */}
+                        {hoveredRating === `${criteriaKey}-${formData.ratings[criteriaKey]}` && formData.ratings[criteriaKey] && (
+                          <div className="mt-2 text-xs text-teal-600 font-medium bg-teal-50 px-3 py-2 rounded-lg">
+                            ✓ Đã chọn: {ratingLabels[formData.ratings[criteriaKey]]}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Status Message */}
+              {saveStatus && (
+                <div className={`mt-4 px-4 py-3 rounded-xl flex items-center gap-2 text-sm font-medium ${
+                  saveStatus === 'success'
+                    ? 'bg-green-100 border-2 border-green-300 text-green-700'
+                    : 'bg-red-100 border-2 border-red-300 text-red-700'
+                }`}>
+                  {saveStatus === 'success' ? (
+                    <>
+                      <CheckCircle className="w-5 h-5" />
+                      Lưu đánh giá thành công!
+                    </>
+                  ) : (
+                    <>
+                      <AlertCircle className="w-5 h-5" />
+                      Lỗi! Vui lòng điền đủ thông tin (*) và chọn trình độ, đánh giá
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Save Button */}
+              <button
+                onClick={handleSaveEvaluation}
+                disabled={loading || !selectedLevel}
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-2xl font-bold hover:from-green-600 hover:to-emerald-700 transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+              >
+                <Save className="w-5 h-5" />
+                {loading ? 'ĐANG LƯU...' : 'GỬI ĐÁNH GIÁ'}
+              </button>
+            </div>
+          </div>
+
+          {/* Chi tiết hiển thị bên phải - Overlay khi click */}
+        </div>
+      </div>
+
+      {/* Modal Popup hiển thị bên cạnh */}
+      {showModal && selectedCriteria && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="bg-black/20 absolute inset-0" onClick={() => setShowModal(false)}></div>
+          
+          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto relative z-50">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-start">
+              <div>
+                <h3 className="text-lg font-bold text-gray-800 mb-2">
+                  {evaluationData[selectedCriteria.level][selectedCriteria.key].label}
+                </h3>
+                <p className="text-xs text-gray-600">Chọn mức độ từ 1 đến 5</p>
+              </div>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {evaluationData[selectedCriteria.level][selectedCriteria.key].descriptions.map((desc, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleRatingSelect(idx + 1)}
+                  className={`w-full p-4 rounded-xl border-2 text-left transition ${
+                    formData.ratings[selectedCriteria.key] === idx + 1
+                      ? 'border-teal-500 bg-teal-50'
+                      : 'border-gray-200 hover:border-teal-400 hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`font-bold text-lg w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm ${
+                      formData.ratings[selectedCriteria.key] === idx + 1
+                        ? 'bg-teal-500 text-white'
+                        : 'bg-gray-200 text-gray-700'
+                    }`}>
+                      {idx + 1}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-800 text-sm mb-2">
+                        {ratingLabels[idx + 1]}
+                      </p>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        {desc}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TrialEvaluationForm;
