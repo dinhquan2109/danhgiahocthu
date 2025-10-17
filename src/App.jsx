@@ -256,7 +256,7 @@ const TrialEvaluationForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 py-4 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-r from-orange-400 to-purple-600 py-4 px-4 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-full opacity-10">
         <div className="absolute top-20 left-10 w-40 h-40 bg-yellow-300 rounded-full blur-3xl"></div>
         <div className="absolute top-40 right-20 w-32 h-32 bg-orange-300 rounded-full blur-3xl"></div>
@@ -347,14 +347,14 @@ const TrialEvaluationForm = () => {
                       <div className="w-1/2 pr-4">
                         <h3 className="font-bold text-gray-800 text-base mb-3">{criteriaData.label}</h3>
                         
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                           {[1, 2, 3, 4, 5].map((rating) => (
                             <div key={rating} className="relative group">
                               <button
                                 onClick={() => handleCriteriaClick(criteriaKey, rating)}
                                 onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
                                 onMouseLeave={() => setHoveredRating(null)}
-                                className={`w-full text-left px-3 py-1 rounded-lg border-2 transition-all duration-200 text-sm ${
+                                className={`w-full text-left px-2 py-0.5 rounded-md border-2 transition-all duration-200 text-xs ${
                                   formData.ratings[criteriaKey] === rating
                                     ? 'border-purple-500 bg-purple-100 text-purple-700'
                                     : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:bg-purple-50'
