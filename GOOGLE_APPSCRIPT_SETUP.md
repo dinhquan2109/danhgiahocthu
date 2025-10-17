@@ -43,13 +43,32 @@ function doGet(e) {
       date: row[10] || ''
     }));
     
-    return ContentService
+    const response = ContentService
       .createTextOutput(JSON.stringify({ success: true, data: result }))
       .setMimeType(ContentService.MimeType.JSON);
+    
+    // Set CORS headers manually
+    response.setHeaders({
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400'
+    });
+    
+    return response;
   } catch (error) {
-    return ContentService
+    const response = ContentService
       .createTextOutput(JSON.stringify({ success: false, error: error.message }))
       .setMimeType(ContentService.MimeType.JSON);
+    
+    response.setHeaders({
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400'
+    });
+    
+    return response;
   }
 }
 
@@ -99,14 +118,49 @@ function doPost(e) {
     
     sheet.appendRow(values);
     
-    return ContentService
+    const response = ContentService
       .createTextOutput(JSON.stringify({ success: true, message: 'Data saved successfully' }))
       .setMimeType(ContentService.MimeType.JSON);
+    
+    // Set CORS headers manually
+    response.setHeaders({
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400'
+    });
+    
+    return response;
   } catch (error) {
-    return ContentService
+    const response = ContentService
       .createTextOutput(JSON.stringify({ success: false, error: error.message }))
       .setMimeType(ContentService.MimeType.JSON);
+    
+    response.setHeaders({
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400'
+    });
+    
+    return response;
   }
+}
+
+// Xử lý OPTIONS request cho CORS
+function doOptions(e) {
+  const response = ContentService
+    .createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT);
+  
+  response.setHeaders({
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400'
+  });
+  
+  return response;
 }
 ```
 
