@@ -287,7 +287,9 @@ const TrialEvaluationForm = () => {
               <div className="flex items-center gap-2 mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-yellow-500 text-2xl">★</span>
-                  <h2 className="text-base font-bold text-purple-800">THÔNG TIN HỌC VIÊN</h2>
+                  <div className="bg-purple-500 text-white px-3 py-1 rounded-lg text-sm font-bold">
+                    THÔNG TIN HỌC VIÊN
+                  </div>
                 </div>
               </div>
 
