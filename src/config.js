@@ -1,11 +1,7 @@
-// Cấu hình Google Sheets API với OAuth 2.0
+// Cấu hình Google Apps Script API
 export const GOOGLE_SHEETS_CONFIG = {
-  // Google Sheets ID thực tế
-  SHEET_ID: '1H-nLX-zMzoxGJAB2HV-bP6_cIiPInVlYz4zYjs0KiLw',
-  
-  // OAuth 2.0 Credentials
-  CLIENT_ID: '1034144698153-qnh5747mmfku65u52s3mp3narrssbq8n.apps.googleusercontent.com',
-  CLIENT_SECRET: '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',
+  // Google Apps Script URL
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyT3wt4VlDCxzAmy0QdNPqe5gHbzVLgk6s6Wadi0wEuVld1VzKRSUT3B36zGgnF9Uxs/exec',
   
   // Tên các sheet trong file Google Sheets
   SHEETS: {
