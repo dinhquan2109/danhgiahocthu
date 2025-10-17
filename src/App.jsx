@@ -225,23 +225,37 @@ const TrialEvaluationForm = () => {
         setConnectionStatus('checking');
         
         // Đợi một chút để Google API script được load
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        
+        console.log('🚀 Starting Google API initialization...');
         
         // Initialize Google API first
         await googleSheetsService.initializeGoogleAPI();
         
+        console.log('🔍 Testing Google Sheets connection...');
         const isConnected = await googleSheetsService.testConnection();
         
         if (isConnected) {
+          console.log('📊 Loading existing data from Google Sheets...');
           const data = await googleSheetsService.getExistingData();
           setAvailableClasses(data);
           setConnectionStatus('connected');
+          console.log('✅ Successfully connected to Google Sheets');
         } else {
+          console.log('❌ Failed to connect to Google Sheets');
           setConnectionStatus('disconnected');
         }
       } catch (error) {
-        console.error('Error loading classes:', error);
+        console.error('❌ Error loading classes:', error);
+        console.error('❌ Error details:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
         setConnectionStatus('error');
+        
+        // Fallback: Show message that data will be saved locally
+        console.log('⚠️ Google Sheets connection failed, data will be saved locally');
       }
     };
 

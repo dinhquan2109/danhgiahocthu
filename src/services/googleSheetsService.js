@@ -47,11 +47,18 @@ class GoogleSheetsService {
   // Load Google Sheets API
   async loadSheetsAPI() {
     try {
+      console.log('🔍 Checking Google API availability...');
+      
       // Kiểm tra xem gapi.client có tồn tại không
-      if (!window.gapi || !window.gapi.client) {
-        throw new Error('Google API client not loaded');
+      if (!window.gapi) {
+        throw new Error('Google API (gapi) not loaded');
+      }
+      
+      if (!window.gapi.client) {
+        throw new Error('Google API client not initialized');
       }
 
+      console.log('🔧 Initializing Google API client...');
       await window.gapi.client.init({
         apiKey: 'AIzaSyB3ZNmQMNbJv_LgPtJ17aQKG-qyNQw6Jcg', // Fallback API key
         clientId: this.clientId,
@@ -59,16 +66,25 @@ class GoogleSheetsService {
         scope: 'https://www.googleapis.com/auth/spreadsheets'
       });
 
+      console.log('🔐 Checking authentication status...');
       // Kiểm tra xem user đã đăng nhập chưa
       const authInstance = window.gapi.auth2.getAuthInstance();
       if (!authInstance.isSignedIn.get()) {
+        console.log('🔑 User not signed in, prompting sign-in...');
         await authInstance.signIn();
       }
 
+      console.log('✅ Getting access token...');
       this.accessToken = window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+      console.log('🎉 Google API initialized successfully');
       return true;
     } catch (error) {
-      console.error('Error initializing Google API:', error);
+      console.error('❌ Error initializing Google API:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       throw error;
     }
   }
