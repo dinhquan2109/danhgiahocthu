@@ -1,10 +1,11 @@
-// Cấu hình Google Sheets API
+// Cấu hình Google Sheets API với OAuth 2.0
 export const GOOGLE_SHEETS_CONFIG = {
   // Google Sheets ID thực tế
   SHEET_ID: '1H-nLX-zMzoxGJAB2HV-bP6_cIiPInVlYz4zYjs0KiLw',
   
-  // API Key từ Google Cloud Console
-  API_KEY: 'AIzaSyB3ZNmQMNbJv_LgPtJ17aQKG-qyNQw6Jcg',
+  // OAuth 2.0 Credentials
+  CLIENT_ID: '1034144698153-qnh5747mmfku65u52s3mp3narrssbq8n.apps.googleusercontent.com',
+  CLIENT_SECRET: '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',
   
   // Tên các sheet trong file Google Sheets
   SHEETS: {

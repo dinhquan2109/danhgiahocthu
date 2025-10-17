@@ -223,6 +223,13 @@ const TrialEvaluationForm = () => {
     const loadClasses = async () => {
       try {
         setConnectionStatus('checking');
+        
+        // Đợi một chút để Google API script được load
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Initialize Google API first
+        await googleSheetsService.initializeGoogleAPI();
+        
         const isConnected = await googleSheetsService.testConnection();
         
         if (isConnected) {
