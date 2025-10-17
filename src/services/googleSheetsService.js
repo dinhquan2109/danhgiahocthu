@@ -3,70 +3,23 @@ import { GOOGLE_SHEETS_CONFIG } from '../config.js';
 class GoogleSheetsService {
   constructor() {
     this.sheetId = GOOGLE_SHEETS_CONFIG.SHEET_ID;
-    this.clientId = GOOGLE_SHEETS_CONFIG.CLIENT_ID;
+    this.apiKey = GOOGLE_SHEETS_CONFIG.API_KEY;
     this.baseUrl = 'https://sheets.googleapis.com/v4/spreadsheets';
-    this.accessToken = null;
-  }
-
-  // Khởi tạo Google API và xác thực
-  async initializeGoogleAPI() {
-    return new Promise((resolve, reject) => {
-      if (window.gapi) {
-        this.loadSheetsAPI().then(resolve).catch(reject);
-        return;
-      }
-
-      // Load Google API script
-      const script = document.createElement('script');
-      script.src = 'https://apis.google.com/js/api.js';
-      script.onload = () => {
-        window.gapi.load('client:auth2', () => {
-          this.loadSheetsAPI().then(resolve).catch(reject);
-        });
-      };
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  // Load Google Sheets API
-  async loadSheetsAPI() {
-    try {
-      await window.gapi.client.init({
-        apiKey: 'AIzaSyB3ZNmQMNbJv_LgPtJ17aQKG-qyNQw6Jcg', // Fallback API key
-        clientId: this.clientId,
-        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-        scope: 'https://www.googleapis.com/auth/spreadsheets'
-      });
-
-      // Kiểm tra xem user đã đăng nhập chưa
-      const authInstance = window.gapi.auth2.getAuthInstance();
-      if (!authInstance.isSignedIn.get()) {
-        await authInstance.signIn();
-      }
-
-      this.accessToken = window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
-      return true;
-    } catch (error) {
-      console.error('Error initializing Google API:', error);
-      throw error;
-    }
   }
 
   // Lấy danh sách dữ liệu đã có
   async getExistingData() {
     try {
-      if (!this.accessToken) {
-        await this.initializeGoogleAPI();
-      }
-
       const range = `${GOOGLE_SHEETS_CONFIG.SHEETS.DATA}!A:K`;
-      const response = await window.gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: this.sheetId,
-        range: range
-      });
-
-      const rows = response.result.values || [];
+      const url = `${this.baseUrl}/${this.sheetId}/values/${range}?key=${this.apiKey}`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const rows = data.values || [];
       
       // Bỏ qua header row (row đầu tiên)
       const evaluations = rows.slice(1).map((row, index) => ({
@@ -94,10 +47,9 @@ class GoogleSheetsService {
   // Ghi kết quả đánh giá vào Google Sheets
   async saveEvaluation(evaluationData) {
     try {
-      if (!this.accessToken) {
-        await this.initializeGoogleAPI();
-      }
-
+      const range = `${GOOGLE_SHEETS_CONFIG.SHEETS.DATA}!A:K`;
+      const url = `${this.baseUrl}/${this.sheetId}/values/${range}:append?valueInputOption=USER_ENTERED&key=${this.apiKey}`;
+      
       // Chuyển đổi ratings thành các giá trị tương ứng
       const getStatusValue = (rating) => {
         const statusMap = {
@@ -136,16 +88,23 @@ class GoogleSheetsService {
           new Date().toISOString().split('T')[0]        // K: Ngày đánh giá
         ]
       ];
-
-      const range = `${GOOGLE_SHEETS_CONFIG.SHEETS.DATA}!A:K`;
-      const response = await window.gapi.client.sheets.spreadsheets.values.append({
-        spreadsheetId: this.sheetId,
-        range: range,
-        valueInputOption: 'USER_ENTERED',
-        values: values
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          values: values
+        })
       });
       
-      return response.result;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      return result;
     } catch (error) {
       console.error('Error saving evaluation:', error);
       throw error;
@@ -155,17 +114,11 @@ class GoogleSheetsService {
   // Kiểm tra kết nối Google Sheets
   async testConnection() {
     try {
-      if (!this.accessToken) {
-        await this.initializeGoogleAPI();
-      }
-
       const range = `${GOOGLE_SHEETS_CONFIG.SHEETS.DATA}!A1`;
-      const response = await window.gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: this.sheetId,
-        range: range
-      });
+      const url = `${this.baseUrl}/${this.sheetId}/values/${range}?key=${this.apiKey}`;
       
-      return response.result !== undefined;
+      const response = await fetch(url);
+      return response.ok;
     } catch (error) {
       console.error('Connection test failed:', error);
       return false;

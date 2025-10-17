@@ -223,10 +223,6 @@ const TrialEvaluationForm = () => {
     const loadClasses = async () => {
       try {
         setConnectionStatus('checking');
-        
-        // Initialize Google API first
-        await googleSheetsService.initializeGoogleAPI();
-        
         const isConnected = await googleSheetsService.testConnection();
         
         if (isConnected) {
