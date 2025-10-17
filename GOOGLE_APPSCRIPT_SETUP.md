@@ -113,7 +113,7 @@ function doPost(e) {
       getCriteriaValue(data.ratings.vocabulary || 1),
       getCriteriaValue(data.ratings.listening || 1),
       getCriteriaValue(data.ratings.reading || 1),
-      new Date().toISOString().split('T')[0]
+      new Date().getTime()
     ];
     
     sheet.appendRow(values);

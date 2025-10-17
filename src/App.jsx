@@ -227,22 +227,17 @@ const TrialEvaluationForm = () => {
         // Đợi một chút để Google API script được load
         await new Promise(resolve => setTimeout(resolve, 3000));
         
-        console.log('🚀 Starting Google API initialization...');
         
         // Initialize Google API first
         await googleSheetsService.initializeGoogleAPI();
         
-        console.log('🔍 Testing Google Sheets connection...');
         const isConnected = await googleSheetsService.testConnection();
         
         if (isConnected) {
-          console.log('📊 Loading existing data from Google Sheets...');
           const data = await googleSheetsService.getExistingData();
           setAvailableClasses(data);
           setConnectionStatus('connected');
-          console.log('✅ Successfully connected to Google Sheets');
         } else {
-          console.log('❌ Failed to connect to Google Sheets');
           setConnectionStatus('disconnected');
         }
       } catch (error) {
@@ -255,7 +250,6 @@ const TrialEvaluationForm = () => {
         setConnectionStatus('error');
         
         // Fallback: Show message that data will be saved locally
-        console.log('⚠️ Google Sheets connection failed, data will be saved locally');
       }
     };
 
@@ -264,9 +258,6 @@ const TrialEvaluationForm = () => {
 
   const handleSaveEvaluation = async () => {
     // Debug: Log thông tin để kiểm tra
-    console.log('Form Data:', formData);
-    console.log('Selected Level:', selectedLevel);
-    console.log('Ratings:', formData.ratings);
 
     // Reset validation error
     setValidationError('');
@@ -326,9 +317,7 @@ const TrialEvaluationForm = () => {
       // Try to save to Google Sheets (optional)
       try {
         await googleSheetsService.saveEvaluation(evaluationData);
-        console.log('✅ Saved to Google Sheets successfully');
       } catch (sheetsError) {
-        console.warn('⚠️ Google Sheets save failed, but data saved to localStorage:', sheetsError);
         // Data is still saved to localStorage, so we continue
       }
       
@@ -349,7 +338,6 @@ const TrialEvaluationForm = () => {
         const data = await googleSheetsService.getExistingData();
         setAvailableClasses(data);
       } catch (reloadError) {
-        console.warn('⚠️ Could not reload from Google Sheets:', reloadError);
         // Continue without error
       }
       
@@ -389,29 +377,6 @@ const TrialEvaluationForm = () => {
         </div>
 
         <div className="w-full">
-          {/* Connection Status */}
-          <div className="mb-4">
-            {connectionStatus === 'checking' && (
-              <div className="bg-blue-100 border border-blue-300 text-blue-700 px-4 py-2 rounded-lg text-sm">
-                🔄 Đang kiểm tra kết nối Google Sheets...
-              </div>
-            )}
-            {connectionStatus === 'connected' && (
-              <div className="bg-green-100 border border-green-300 text-green-700 px-4 py-2 rounded-lg text-sm">
-                ✅ Đã kết nối Google Sheets ({availableClasses.length} bản ghi dữ liệu)
-              </div>
-            )}
-            {connectionStatus === 'disconnected' && (
-              <div className="bg-yellow-100 border border-yellow-300 text-yellow-700 px-4 py-2 rounded-lg text-sm">
-                ⚠️ Không thể kết nối Google Sheets. Vui lòng kiểm tra cấu hình.
-              </div>
-            )}
-            {connectionStatus === 'error' && (
-              <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-lg text-sm">
-                ❌ Lỗi kết nối Google Sheets. Vui lòng kiểm tra lại cấu hình.
-              </div>
-            )}
-          </div>
 
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-xl p-4 border-2 border-white">
             {/* Thông tin học viên */}
@@ -556,29 +521,6 @@ const TrialEvaluationForm = () => {
               {loading ? 'ĐANG LƯU...' : 'GỬI ĐÁNH GIÁ'}
             </button>
 
-            {/* Export Button */}
-            <button
-              onClick={async () => {
-                try {
-                  const localData = JSON.parse(localStorage.getItem('evaluationsList') || '[]');
-                  if (localData.length === 0) {
-                    alert('Không có dữ liệu để export');
-                    return;
-                  }
-                  
-                  for (const item of localData) {
-                    await googleSheetsService.saveEvaluation(item);
-                  }
-                  alert(`Đã export ${localData.length} bản ghi vào Google Sheets`);
-                } catch (error) {
-                  console.error('Export error:', error);
-                  alert('Lỗi khi export dữ liệu');
-                }
-              }}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-2 rounded-lg font-medium hover:from-green-600 hover:to-emerald-700 transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 mt-2"
-            >
-              📤 Export dữ liệu vào Google Sheets
-            </button>
           </div>
         </div>
       </div>
