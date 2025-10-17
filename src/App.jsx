@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import googleSheetsService from './services/googleSheetsService';
 
 const TrialEvaluationForm = () => {
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
   const [hoveredRating, setHoveredRating] = useState(null);
+  const [availableClasses, setAvailableClasses] = useState([]);
+  const [connectionStatus, setConnectionStatus] = useState('checking');
 
   const levels = {
     'I': 'I. Cho người mới bắt đầu',
@@ -210,8 +213,31 @@ const TrialEvaluationForm = () => {
   };
 
 
+  // Load available classes from Google Sheets
+  useEffect(() => {
+    const loadClasses = async () => {
+      try {
+        setConnectionStatus('checking');
+        const isConnected = await googleSheetsService.testConnection();
+        
+        if (isConnected) {
+          const data = await googleSheetsService.getExistingData();
+          setAvailableClasses(data);
+          setConnectionStatus('connected');
+        } else {
+          setConnectionStatus('disconnected');
+        }
+      } catch (error) {
+        console.error('Error loading classes:', error);
+        setConnectionStatus('error');
+      }
+    };
+
+    loadClasses();
+  }, []);
+
   const handleSaveEvaluation = async () => {
-    if (!formData.studentName || !formData.classCode || !formData.teacherName || !formData.level) {
+    if (!formData.studentName || !formData.classCode || !formData.teacherName || !selectedLevel) {
       setSaveStatus('error');
       setTimeout(() => setSaveStatus(''), 3000);
       return;
@@ -224,32 +250,51 @@ const TrialEvaluationForm = () => {
     }
 
     setLoading(true);
+    setSaveStatus('');
+
     try {
-      const evaluation = {
-        id: Date.now(),
-        ...formData,
-        savedAt: new Date().toISOString()
+      const evaluationData = {
+        studentName: formData.studentName,
+        classCode: formData.classCode,
+        teacherName: formData.teacherName,
+        level: selectedLevel,
+        ratings: formData.ratings,
+        comments: ''
       };
 
-      const existing = JSON.parse(localStorage.getItem('evaluationsList') || '[]');
-      const updated = [...existing, evaluation];
-      localStorage.setItem('evaluationsList', JSON.stringify(updated));
-
+      // Save to Google Sheets
+      await googleSheetsService.saveEvaluation(evaluationData);
+      
+      // Also save to localStorage as backup
+      const existingData = JSON.parse(localStorage.getItem('evaluationsList') || '[]');
+      existingData.push({
+        ...evaluationData,
+        id: Date.now(),
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem('evaluationsList', JSON.stringify(existingData));
+      
       setSaveStatus('success');
-      setTimeout(() => {
-        setFormData({
-          studentName: '',
-          classCode: '',
-          teacherName: '',
-          level: '',
-          ratings: {}
-        });
-        setSelectedLevel('');
-        setSaveStatus('');
-      }, 1500);
+      
+      // Reset form
+      setFormData({
+        studentName: '',
+        classCode: '',
+        teacherName: '',
+        level: '',
+        ratings: {}
+      });
+      setSelectedLevel('');
+      
+      // Reload data to update the list
+      const data = await googleSheetsService.getExistingData();
+      setAvailableClasses(data);
+      
+      setTimeout(() => setSaveStatus(''), 3000);
     } catch (error) {
-      console.error('Error saving:', error);
+      console.error('Error saving evaluation:', error);
       setSaveStatus('error');
+      setTimeout(() => setSaveStatus(''), 3000);
     } finally {
       setLoading(false);
     }
@@ -281,6 +326,30 @@ const TrialEvaluationForm = () => {
         </div>
 
         <div className="w-full">
+          {/* Connection Status */}
+          <div className="mb-4">
+            {connectionStatus === 'checking' && (
+              <div className="bg-blue-100 border border-blue-300 text-blue-700 px-4 py-2 rounded-lg text-sm">
+                🔄 Đang kiểm tra kết nối Google Sheets...
+              </div>
+            )}
+            {connectionStatus === 'connected' && (
+              <div className="bg-green-100 border border-green-300 text-green-700 px-4 py-2 rounded-lg text-sm">
+                ✅ Đã kết nối Google Sheets ({availableClasses.length} bản ghi dữ liệu)
+              </div>
+            )}
+            {connectionStatus === 'disconnected' && (
+              <div className="bg-yellow-100 border border-yellow-300 text-yellow-700 px-4 py-2 rounded-lg text-sm">
+                ⚠️ Không thể kết nối Google Sheets. Vui lòng kiểm tra cấu hình.
+              </div>
+            )}
+            {connectionStatus === 'error' && (
+              <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-lg text-sm">
+                ❌ Lỗi kết nối Google Sheets. Vui lòng kiểm tra lại cấu hình.
+              </div>
+            )}
+          </div>
+
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-xl p-4 border-2 border-white">
             {/* Thông tin học viên */}
             <div className="bg-purple-50 rounded-xl p-4 mb-4 border border-purple-200">
