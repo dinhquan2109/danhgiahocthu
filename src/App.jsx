@@ -5,6 +5,7 @@ const TrialEvaluationForm = () => {
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
+  const [hoveredRating, setHoveredRating] = useState(null);
 
   const levels = {
     'I': 'I. Cho người mới bắt đầu',
@@ -339,34 +340,37 @@ const TrialEvaluationForm = () => {
                     <div key={criteriaKey} className="relative">
                       <h3 className="font-semibold text-gray-800 text-sm mb-3">{criteriaData.label}</h3>
                       
-                      <div className="flex flex-wrap gap-2">
+                      <div className="space-y-2">
                         {[1, 2, 3, 4, 5].map((rating) => (
-                          <button
-                            key={rating}
-                            onClick={() => handleCriteriaClick(criteriaKey, rating)}
-                            className={`w-10 h-10 rounded-lg border-2 font-bold transition-all duration-200 text-sm flex items-center justify-center ${
-                              formData.ratings[criteriaKey] === rating
-                                ? 'border-purple-500 bg-purple-500 text-white shadow-lg'
-                                : 'border-gray-300 bg-white text-gray-700 hover:border-purple-400 hover:bg-purple-50 hover:shadow-md'
-                            }`}
-                          >
-                            {rating}
-                          </button>
+                          <div key={rating} className="relative group">
+                            <button
+                              onClick={() => handleCriteriaClick(criteriaKey, rating)}
+                              onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
+                              onMouseLeave={() => setHoveredRating(null)}
+                              className={`w-full text-left px-3 py-2 rounded-lg border-2 transition-all duration-200 text-sm ${
+                                formData.ratings[criteriaKey] === rating
+                                  ? 'border-purple-500 bg-purple-100 text-purple-700'
+                                  : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:bg-purple-50'
+                              }`}
+                            >
+                              {rating}. {ratingLabels[rating]}
+                            </button>
+
+                            {/* Speech bubble hiển thị khi hover */}
+                            {hoveredRating === `${criteriaKey}-${rating}` && (
+                              <div className="absolute left-0 top-full mt-2 z-10">
+                                <div className="bg-white border-2 border-gray-300 rounded-2xl p-3 shadow-lg relative max-w-xs">
+                                  <div className="text-xs text-gray-700 leading-relaxed">
+                                    {criteriaData.descriptions[rating - 1]}
+                                  </div>
+                                  {/* Speech bubble tail */}
+                                  <div className="absolute -top-2 left-6 w-4 h-4 bg-white border-l-2 border-t-2 border-gray-300 transform rotate-45"></div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
-
-                      {/* Speech bubble hiển thị khi đã chọn */}
-                      {formData.ratings[criteriaKey] && (
-                        <div className="mt-4 relative">
-                          <div className="bg-white border-2 border-gray-300 rounded-2xl p-3 shadow-lg relative">
-                            <div className="text-xs text-gray-700 leading-relaxed">
-                              {evaluationData[selectedLevel][criteriaKey].descriptions[formData.ratings[criteriaKey] - 1]}
-                            </div>
-                            {/* Speech bubble tail */}
-                            <div className="absolute -top-2 left-6 w-4 h-4 bg-white border-l-2 border-t-2 border-gray-300 transform rotate-45"></div>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
