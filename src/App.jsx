@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { FileText, Save, AlertCircle, CheckCircle, X } from 'lucide-react';
+import { FileText, Save, AlertCircle, CheckCircle } from 'lucide-react';
 
 const TrialEvaluationForm = () => {
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
-  const [selectedCriteria, setSelectedCriteria] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [hoveredRating, setHoveredRating] = useState(null);
 
   const levels = {
     'I': 'I. Cho người mới bắt đầu',
@@ -202,20 +199,15 @@ const TrialEvaluationForm = () => {
   };
 
   const handleCriteriaClick = (criteriaKey, ratingValue) => {
-    setSelectedCriteria({ key: criteriaKey, level: selectedLevel, rating: ratingValue });
-    setShowModal(true);
-  };
-
-  const handleRatingSelect = (ratingValue) => {
     setFormData(prev => ({
       ...prev,
       ratings: {
         ...prev.ratings,
-        [selectedCriteria.key]: ratingValue
+        [criteriaKey]: ratingValue
       }
     }));
-    setShowModal(false);
   };
+
 
   const handleSaveEvaluation = async () => {
     if (!formData.studentName || !formData.classCode || !formData.teacherName || !formData.level) {
@@ -336,24 +328,26 @@ const TrialEvaluationForm = () => {
             {/* Đánh giá chi tiết */}
             {selectedLevel && (
               <div className="bg-white rounded-xl p-4 mb-4">
-                <h2 className="text-base font-bold text-gray-800 mb-4">ĐÁNH GIÁ CHI TIẾT</h2>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="bg-purple-500 text-white px-3 py-1 rounded-lg text-sm font-bold">
+                    ĐÁNH GIÁ CHI TIẾT
+                  </div>
+                </div>
 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {Object.entries(evaluationData[selectedLevel]).map(([criteriaKey, criteriaData]) => (
-                    <div key={criteriaKey} className="border border-gray-200 rounded-lg p-4">
+                    <div key={criteriaKey} className="relative">
                       <h3 className="font-semibold text-gray-800 text-sm mb-3">{criteriaData.label}</h3>
                       
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-2">
                         {[1, 2, 3, 4, 5].map((rating) => (
                           <button
                             key={rating}
                             onClick={() => handleCriteriaClick(criteriaKey, rating)}
-                            onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
-                            onMouseLeave={() => setHoveredRating(null)}
-                            className={`w-12 h-12 rounded-lg border-2 font-bold transition-all duration-200 text-sm flex items-center justify-center ${
+                            className={`w-10 h-10 rounded-lg border-2 font-bold transition-all duration-200 text-sm flex items-center justify-center ${
                               formData.ratings[criteriaKey] === rating
-                                ? 'border-teal-500 bg-teal-500 text-white shadow-lg transform scale-105'
-                                : 'border-gray-300 bg-white text-gray-700 hover:border-teal-400 hover:bg-teal-50 hover:shadow-md hover:scale-105'
+                                ? 'border-purple-500 bg-purple-500 text-white shadow-lg'
+                                : 'border-gray-300 bg-white text-gray-700 hover:border-purple-400 hover:bg-purple-50 hover:shadow-md'
                             }`}
                           >
                             {rating}
@@ -361,10 +355,16 @@ const TrialEvaluationForm = () => {
                         ))}
                       </div>
 
-                      {/* Tooltip hiển thị khi hover */}
-                      {hoveredRating === `${criteriaKey}-${formData.ratings[criteriaKey]}` && formData.ratings[criteriaKey] && (
-                        <div className="mt-3 text-xs text-teal-600 font-medium bg-teal-50 px-3 py-2 rounded-lg border border-teal-200">
-                          ✓ Đã chọn: {ratingLabels[formData.ratings[criteriaKey]]}
+                      {/* Speech bubble hiển thị khi đã chọn */}
+                      {formData.ratings[criteriaKey] && (
+                        <div className="mt-4 relative">
+                          <div className="bg-white border-2 border-gray-300 rounded-2xl p-3 shadow-lg relative">
+                            <div className="text-xs text-gray-700 leading-relaxed">
+                              {evaluationData[selectedLevel][criteriaKey].descriptions[formData.ratings[criteriaKey] - 1]}
+                            </div>
+                            {/* Speech bubble tail */}
+                            <div className="absolute -top-2 left-6 w-4 h-4 bg-white border-l-2 border-t-2 border-gray-300 transform rotate-45"></div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -407,61 +407,6 @@ const TrialEvaluationForm = () => {
         </div>
       </div>
 
-      {/* Modal Popup hiển thị bên cạnh */}
-      {showModal && selectedCriteria && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2">
-          <div className="bg-black/20 absolute inset-0" onClick={() => setShowModal(false)}></div>
-          
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto relative z-50">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-3 flex justify-between items-start">
-              <div>
-                <h3 className="text-base font-bold text-gray-800 mb-1">
-                  {evaluationData[selectedCriteria.level][selectedCriteria.key].label}
-                </h3>
-                <p className="text-xs text-gray-600">Chọn mức độ từ 1 đến 5</p>
-              </div>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-1 hover:bg-gray-100 rounded-lg transition"
-              >
-                <X className="w-4 h-4 text-gray-600" />
-              </button>
-            </div>
-
-            <div className="p-4 space-y-3">
-              {evaluationData[selectedCriteria.level][selectedCriteria.key].descriptions.map((desc, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleRatingSelect(idx + 1)}
-                  className={`w-full p-3 rounded-lg border-2 text-left transition ${
-                    formData.ratings[selectedCriteria.key] === idx + 1
-                      ? 'border-teal-500 bg-teal-50'
-                      : 'border-gray-200 hover:border-teal-400 hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-start gap-2">
-                    <div className={`font-bold text-sm w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      formData.ratings[selectedCriteria.key] === idx + 1
-                        ? 'bg-teal-500 text-white'
-                        : 'bg-gray-200 text-gray-700'
-                    }`}>
-                      {idx + 1}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-800 text-xs mb-1">
-                        {ratingLabels[idx + 1]}
-                      </p>
-                      <p className="text-xs text-gray-600 leading-relaxed">
-                        {desc}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
