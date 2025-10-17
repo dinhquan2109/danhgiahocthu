@@ -282,7 +282,10 @@ const TrialEvaluationForm = () => {
             <div className="bg-white rounded-xl p-4 mb-4">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-6 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded"></div>
-                <h2 className="text-base font-bold text-gray-800">THÔNG TIN HỌC VIÊN</h2>
+                <div className="flex items-center gap-2">
+                  <span className="text-yellow-500 text-lg">★</span>
+                  <h2 className="text-base font-bold text-gray-800">THÔNG TIN HỌC VIÊN</h2>
+                </div>
               </div>
 
               <div className="space-y-3">
@@ -337,39 +340,42 @@ const TrialEvaluationForm = () => {
 
                 <div className="space-y-6">
                   {Object.entries(evaluationData[selectedLevel]).map(([criteriaKey, criteriaData]) => (
-                    <div key={criteriaKey} className="relative">
-                      <h3 className="font-semibold text-gray-800 text-sm mb-3">{criteriaData.label}</h3>
-                      
-                      <div className="space-y-2">
-                        {[1, 2, 3, 4, 5].map((rating) => (
-                          <div key={rating} className="relative group">
-                            <button
-                              onClick={() => handleCriteriaClick(criteriaKey, rating)}
-                              onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
-                              onMouseLeave={() => setHoveredRating(null)}
-                              className={`w-full text-left px-3 py-2 rounded-lg border-2 transition-all duration-200 text-sm ${
-                                formData.ratings[criteriaKey] === rating
-                                  ? 'border-purple-500 bg-purple-100 text-purple-700'
-                                  : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:bg-purple-50'
-                              }`}
-                            >
-                              {rating}. {ratingLabels[rating]}
-                            </button>
+                    <div key={criteriaKey} className="relative flex">
+                      {/* Phần bên trái - Danh sách lựa chọn */}
+                      <div className="w-2/3 pr-4">
+                        <h3 className="font-bold text-gray-800 text-base mb-3">{criteriaData.label}</h3>
+                        
+                        <div className="space-y-2">
+                          {[1, 2, 3, 4, 5].map((rating) => (
+                            <div key={rating} className="relative group">
+                              <button
+                                onClick={() => handleCriteriaClick(criteriaKey, rating)}
+                                onMouseEnter={() => setHoveredRating(`${criteriaKey}-${rating}`)}
+                                onMouseLeave={() => setHoveredRating(null)}
+                                className={`w-full text-left px-3 py-2 rounded-lg border-2 transition-all duration-200 text-sm ${
+                                  formData.ratings[criteriaKey] === rating
+                                    ? 'border-purple-500 bg-purple-100 text-purple-700'
+                                    : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300 hover:bg-purple-50'
+                                }`}
+                              >
+                                {rating}. {ratingLabels[rating]}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
 
-                            {/* Speech bubble hiển thị khi hover */}
-                            {hoveredRating === `${criteriaKey}-${rating}` && (
-                              <div className="absolute left-0 top-full mt-2 z-10">
-                                <div className="bg-white border-2 border-gray-300 rounded-2xl p-3 shadow-lg relative max-w-xs">
-                                  <div className="text-xs text-gray-700 leading-relaxed">
-                                    {criteriaData.descriptions[rating - 1]}
-                                  </div>
-                                  {/* Speech bubble tail */}
-                                  <div className="absolute -top-2 left-6 w-4 h-4 bg-white border-l-2 border-t-2 border-gray-300 transform rotate-45"></div>
-                                </div>
+                      {/* Phần bên phải - Hiển thị mô tả khi hover */}
+                      <div className="w-1/3 pl-4">
+                        {hoveredRating && hoveredRating.startsWith(`${criteriaKey}-`) && (
+                          <div className="sticky top-4">
+                            <div className="bg-white border-2 border-gray-300 rounded-2xl p-4 shadow-lg">
+                              <div className="text-sm text-gray-700 leading-relaxed">
+                                {criteriaData.descriptions[parseInt(hoveredRating.split('-')[1]) - 1]}
                               </div>
-                            )}
+                            </div>
                           </div>
-                        ))}
+                        )}
                       </div>
                     </div>
                   ))}
