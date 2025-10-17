@@ -50,6 +50,9 @@ class GoogleSheetsService {
       const range = `${GOOGLE_SHEETS_CONFIG.SHEETS.DATA}!A:K`;
       const url = `${this.baseUrl}/${this.sheetId}/values/${range}:append?valueInputOption=USER_ENTERED&key=${this.apiKey}`;
       
+      console.log('💾 Saving evaluation to:', url);
+      console.log('📊 Evaluation data:', evaluationData);
+      
       // Chuyển đổi ratings thành các giá trị tương ứng
       const getStatusValue = (rating) => {
         const statusMap = {
@@ -89,6 +92,8 @@ class GoogleSheetsService {
         ]
       ];
       
+      console.log('📝 Values to save:', values);
+      
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -99,14 +104,19 @@ class GoogleSheetsService {
         })
       });
       
+      console.log('📡 Save response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ Save failed:', errorText);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
       
       const result = await response.json();
+      console.log('✅ Save successful:', result);
       return result;
     } catch (error) {
-      console.error('Error saving evaluation:', error);
+      console.error('❌ Error saving evaluation:', error);
       throw error;
     }
   }
@@ -117,10 +127,20 @@ class GoogleSheetsService {
       const range = `${GOOGLE_SHEETS_CONFIG.SHEETS.DATA}!A1`;
       const url = `${this.baseUrl}/${this.sheetId}/values/${range}?key=${this.apiKey}`;
       
+      console.log('🔍 Testing connection to:', url);
       const response = await fetch(url);
-      return response.ok;
+      console.log('📡 Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Connection failed:', errorText);
+        return false;
+      }
+      
+      console.log('✅ Connection successful');
+      return true;
     } catch (error) {
-      console.error('Connection test failed:', error);
+      console.error('❌ Connection test failed:', error);
       return false;
     }
   }
